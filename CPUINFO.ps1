@@ -1,3 +1,19 @@
+# Controleer of het script met administrator rechten draait
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+# Als het script niet met admin rechten draait, herstart het met verhoogde rechten
+if (-not $isAdmin) {
+    Write-Host "Script wordt herstart met administrator rechten..." -ForegroundColor Yellow
+    Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    Exit
+}
+
+# Zet de output encoding naar UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+# Definieer het graden symbool
+$degreeSymbol = [char]176
+
 # Gedetailleerde CPU-informatie ophalen
 Write-Host "`nGedetailleerde CPU-informatie:" -ForegroundColor Green
 Get-CimInstance -ClassName Win32_Processor | Select-Object @{Name="CPU Naam";Expression={$_.Name}},
@@ -21,21 +37,18 @@ Get-CimInstance -ClassName Win32_Processor | Select-Object @{Name="CPU Belasting
 
 # CPU temperatuur ophalen indien beschikbaar
 Write-Host "`nCPU Temperatuurinformatie:" -ForegroundColor Green
-# Controleer of het script met administrator rechten draait
-$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-if (-not $isAdmin) {
-    Write-Host "Temperatuurinformatie is niet beschikbaar - Administrator rechten zijn vereist" -ForegroundColor Yellow
-} else {
-    Try {
-        Get-CimInstance MSAcpi_ThermalZoneTemperature -Namespace "root/wmi" | 
-        Select-Object @{Name="Temperatuur (°C)";Expression={[math]::Round(($_.CurrentTemperature - 2732) / 10.0, 2)}} | 
-        Format-Table -AutoSize
-    } Catch {
-        Write-Host "Temperatuurinformatie kon niet worden opgehaald" -ForegroundColor Yellow
-    }
+Try {
+    $tempOutput = Get-CimInstance MSAcpi_ThermalZoneTemperature -Namespace "root/wmi" | 
+        Select-Object @{Name="Temperatuur ($degreeSymbol C)";Expression={[math]::Round(($_.CurrentTemperature - 2732) / 10.0, 2)}}
+    $tempOutput | Format-Table -AutoSize
+} Catch {
+    Write-Host "Temperatuurinformatie kon niet worden opgehaald" -ForegroundColor Yellow
 }
 
 # Extra processor details van ComputerInfo
 Write-Host "`nAanvullende Processor Informatie:" -ForegroundColor Green
 Get-ComputerInfo -Property "*processor*" | Format-List
+
+# Wacht op gebruiker input voordat het venster sluit
+Write-Host "`nDruk op een toets om af te sluiten..." -ForegroundColor Cyan
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

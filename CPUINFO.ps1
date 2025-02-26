@@ -1,0 +1,2 @@
+
+Get-ComputerInfo -Property "*processor*"

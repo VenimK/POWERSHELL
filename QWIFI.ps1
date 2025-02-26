@@ -3,18 +3,18 @@
 $SSID = "Donk86"
 $Password = "poiu1234"
 
-# Generate WiFi QR Code using QR Server API
+# Genereer WiFi QR Code met QR Server API
 $WifiString = "WIFI:T:WPA;S:$SSID;P:$Password;;"
-Write-Host "Generating QR Code for WiFi network..."
+Write-Host "QR Code aan het genereren voor WiFi netwerk..."
 
-# Create the QR code URL (using qrserver.com API)
+# Maak de QR code URL (met qrserver.com API)
 $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + [uri]::EscapeDataString($WifiString)
 
-# Download the QR code
+# Download de QR code
 $QRPath = Join-Path $PSScriptRoot "WiFiQRCode.png"
 $webClient = New-Object System.Net.WebClient
 $webClient.DownloadFile($qrUrl, $QRPath)
-Write-Host "QR Code generated at: $QRPath"
+Write-Host "QR Code gegenereerd op locatie: $QRPath"
 
 Write-Host "Automatisch verbinden met $SSID..."
 

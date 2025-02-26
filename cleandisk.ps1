@@ -1,13 +1,13 @@
-#3# Using Disk cleanup Tool  
-# Display a message indicating the usage of the Disk Cleanup tool
-write-Host "Using Disk cleanup Tool" -ForegroundColor Yellow  
-# Run the Disk Cleanup tool with the specified sagerun parameter
+#3# Schijfopruiming gebruiken  
+# Toon een bericht dat aangeeft dat de Schijfopruiming wordt gebruikt
+Write-Host "Schijfopruiming wordt gebruikt" -ForegroundColor Yellow  
+# Start de Schijfopruiming met de opgegeven sagerun parameter
 cleanmgr /sagerun:1 | out-Null  
-# Emit a beep sound using ASCII code 7
+# Geef een pieptoon weer met ASCII-code 7
 Write-Host "$([char]7)"  
-# Pause the script for 5 seconds
+# Pauzeer het script voor 5 seconden
 Sleep 5  
-# Display a success message indicating that Disk Cleanup was successfully done
-write-Host "Disk Cleanup Successfully done" -ForegroundColor Green  
-# Pause the script for 10 seconds
+# Toon een succesbericht dat de Schijfopruiming is voltooid
+Write-Host "Schijfopruiming is succesvol voltooid" -ForegroundColor Green  
+# Pauzeer het script voor 10 seconden
 Sleep 10  

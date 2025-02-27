@@ -46,46 +46,46 @@ function Get-FormattedSize {
     return "{0:N2} {1}" -f $Bytes, $sizes[$order]
 }
 
-function Check-BIOSUpdates {
+function Controleer-BIOSUpdates {
     param (
-        [string]$Manufacturer,
+        [string]$Fabrikant,
         [string]$Model,
-        [string]$CurrentBIOSVersion
+        [string]$HuidigeBIOSVersie
     )
 
     try {
-        Write-ColoredHeader "BIOS UPDATE CHECK"
+        Write-ColoredHeader "BIOS UPDATE CONTROLE"
         
-        switch -Wildcard ($Manufacturer.ToLower()) {
+        switch -Wildcard ($Fabrikant.ToLower()) {
             "*asus*" {
                 $modelFormatted = $Model.Replace(" ", "-")
                 $supportUrl = "https://www.asus.com/supportonly/$modelFormatted/HelpDesk_BIOS/"
-                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
-                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                Write-Host "BIOS Ondersteuningspagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $HuidigeBIOSVersie" -ForegroundColor Green
                 Write-Host "`nGa naar de bovenstaande URL om te controleren op BIOS updates." -ForegroundColor Yellow
                 Write-Host "Let op: Download en installeer BIOS updates alleen van de officiële website." -ForegroundColor Yellow
             }
             "*dell*" {
                 $serviceTag = (Get-CimInstance -ClassName Win32_BIOS).SerialNumber
-                $supportUrl = "https://www.dell.com/support/home/product-support/servicetag/$serviceTag/drivers"
-                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
-                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                $supportUrl = "https://www.dell.com/support/home/nl-nl/product-support/servicetag/$serviceTag/drivers"
+                Write-Host "BIOS Ondersteuningspagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $HuidigeBIOSVersie" -ForegroundColor Green
                 Write-Host "`nGa naar de bovenstaande URL om te controleren op BIOS updates." -ForegroundColor Yellow
             }
             "*hp*" {
-                $supportUrl = "https://support.hp.com/drivers"
-                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
-                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                $supportUrl = "https://support.hp.com/nl-nl/drivers"
+                Write-Host "BIOS Ondersteuningspagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $HuidigeBIOSVersie" -ForegroundColor Green
                 Write-Host "`nGa naar de bovenstaande URL en voer uw productmodel ($Model) in." -ForegroundColor Yellow
             }
             "*lenovo*" {
-                $supportUrl = "https://pcsupport.lenovo.com/downloads/ds012808"
-                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
-                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                $supportUrl = "https://pcsupport.lenovo.com/nl/nl/downloads/ds012808"
+                Write-Host "BIOS Ondersteuningspagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $HuidigeBIOSVersie" -ForegroundColor Green
                 Write-Host "`nGa naar de bovenstaande URL en voer uw productmodel ($Model) in." -ForegroundColor Yellow
             }
             default {
-                Write-Host "Automatische BIOS update controle niet beschikbaar voor $Manufacturer" -ForegroundColor Yellow
+                Write-Host "Automatische BIOS update controle niet beschikbaar voor $Fabrikant" -ForegroundColor Yellow
                 Write-Host "Bezoek de website van uw fabrikant voor BIOS updates." -ForegroundColor Yellow
             }
         }
@@ -94,6 +94,7 @@ function Check-BIOSUpdates {
         Write-Host "- Maak altijd een back-up van uw gegevens voor het updaten van de BIOS" -ForegroundColor Red
         Write-Host "- Zorg voor een stabiele stroomvoorziening tijdens de BIOS update" -ForegroundColor Red
         Write-Host "- Onderbreek het update proces NOOIT" -ForegroundColor Red
+        Write-Host "- Sluit alle andere programma's tijdens de update" -ForegroundColor Red
     }
     catch {
         Write-Host "Fout bij het controleren van BIOS updates: $($_.Exception.Message)" -ForegroundColor Red
@@ -166,7 +167,7 @@ Write-Host "BIOS Release Datum: " -NoNewline; Write-Host $bios.ReleaseDate.ToStr
 Write-Host "Serienummer: " -NoNewline; Write-Host $bios.SerialNumber -ForegroundColor Green
 Write-Host "SMBIOS Versie: " -NoNewline; Write-Host $bios.SMBIOSBIOSVersion -ForegroundColor Green
 
-Check-BIOSUpdates -Manufacturer $computerSystem.Manufacturer -Model $computerSystem.Model -CurrentBIOSVersion $bios.Version
+Controleer-BIOSUpdates -Fabrikant $computerSystem.Manufacturer -Model $computerSystem.Model -HuidigeBIOSVersie $bios.Version
 
 # Moederbord Informatie
 Write-ColoredHeader "MOEDERBORD INFORMATIE"
@@ -448,22 +449,23 @@ if ($ExportToHTML) {
 
         <div class="info-group">
             <h2>BIOS Update Informatie</h2>
-            <p><span class="label">Support Pagina:</span> <span class="value"><a href="$(
+            <p><span class="label">Ondersteuningspagina:</span> <span class="value"><a href="$(
                 switch -Wildcard ($computerSystem.Manufacturer.ToLower()) {
                     "*asus*" { "https://www.asus.com/supportonly/$($computerSystem.Model.Replace(' ', '-'))/HelpDesk_BIOS/" }
-                    "*dell*" { "https://www.dell.com/support/home/product-support/servicetag/$($bios.SerialNumber)/drivers" }
-                    "*hp*" { "https://support.hp.com/drivers" }
-                    "*lenovo*" { "https://pcsupport.lenovo.com/downloads/ds012808" }
+                    "*dell*" { "https://www.dell.com/support/home/nl-nl/product-support/servicetag/$($bios.SerialNumber)/drivers" }
+                    "*hp*" { "https://support.hp.com/nl-nl/drivers" }
+                    "*lenovo*" { "https://pcsupport.lenovo.com/nl/nl/downloads/ds012808" }
                     default { "#" }
                 }
             )" target="_blank">BIOS Downloads</a></span></p>
             <div class="warning" style="margin-top: 15px; padding: 10px; border-left: 4px solid #e74c3c;">
-                <strong>Waarschuwing voor BIOS Updates:</strong>
+                <strong>Waarschuwingen voor BIOS Updates:</strong>
                 <ul>
                     <li>Maak altijd een back-up van uw gegevens voor het updaten van de BIOS</li>
                     <li>Zorg voor een stabiele stroomvoorziening tijdens de BIOS update</li>
                     <li>Onderbreek het update proces NOOIT</li>
                     <li>Download BIOS updates alleen van de officiële website van de fabrikant</li>
+                    <li>Sluit alle andere programma's tijdens de update</li>
                 </ul>
             </div>
         </div>

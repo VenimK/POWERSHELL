@@ -1,7 +1,9 @@
 # WiFi Verbinding Script
-# Vooraf ingestelde netwerkinformatie
-$SSID = "Donk86"
-$Password = "poiu1234"
+# Vraag gebruiker om netwerkinformatie
+$SSID = Read-Host "Voer de naam van het WiFi netwerk (SSID) in"
+$Password = Read-Host "Voer het WiFi wachtwoord in" -AsSecureString
+$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
+$Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 
 # Genereer WiFi QR Code met QR Server API
 $WifiString = "WIFI:T:WPA;S:$SSID;P:$Password;;"

@@ -1,84 +1,172 @@
 # Laad benodigde assemblies voor WinForms
 Add-Type -AssemblyName System.Windows.Forms
 
-# Functie om het uitvoeringsbeleid te controleren en aan te passen
-function Controleer-UitvoerBeleid {
-    $huidigBeleid = Get-ExecutionPolicy
-    if ($huidigBeleid -eq 'Restricted') {
-        $resultaat = [System.Windows.Forms.MessageBox]::Show(
-            "Het huidige uitvoeringsbeleid is ingesteld op 'Restricted'.`n`n" +
-            "Dit voorkomt dat scripts kunnen worden uitgevoerd. Wilt u het uitvoeringsbeleid wijzigen naar 'RemoteSigned'?",
-            "Uitvoeringsbeleid Waarschuwing",
+# Get system language/culture
+$systemCulture = (Get-Culture).Name
+$translations = @{
+    'nl-NL' = @{
+        'ExecutionPolicyRestricted' = "Het huidige uitvoeringsbeleid is ingesteld op 'Restricted'.`n`nDit voorkomt dat scripts kunnen worden uitgevoerd. Wilt u het uitvoeringsbeleid wijzigen naar 'RemoteSigned'?"
+        'ExecutionPolicyWarning' = "Uitvoeringsbeleid Waarschuwing"
+        'PolicyChanged' = "Uitvoeringsbeleid is gewijzigd naar 'RemoteSigned'."
+        'PolicyChangedTitle' = "Beleid Gewijzigd"
+        'PolicyChangeError' = "Kon het uitvoeringsbeleid niet wijzigen: {0}"
+        'ErrorTitle' = "Fout"
+        'OperationCanceled' = "Bewerking geannuleerd. Script wordt afgesloten."
+        'CanceledTitle' = "Geannuleerd"
+        'JsonFiles' = "JSON bestanden (*.json)|*.json|Alle bestanden (*.*)|*.*"
+        'SelectWingetFile' = "Selecteer Winget Import Bestand"
+        'ConfirmImport' = "Dit zal alle applicaties installeren die in het geselecteerde bestand staan.`n`nWilt u doorgaan?"
+        'ConfirmImportTitle' = "Bevestig Import"
+        'ImportSuccess' = "Applicaties zijn succesvol geimporteerd van {0}"
+        'SuccessTitle' = "Succes"
+        'ImportCanceled' = "Import bewerking is geannuleerd."
+        'NoFileSelected' = "Geen bestand geselecteerd."
+        'ErrorOccurred' = "Er is een fout opgetreden: {0}"
+    }
+    'en-US' = @{
+        'ExecutionPolicyRestricted' = "The current execution policy is set to 'Restricted'.`n`nThis prevents scripts from running. Would you like to change the execution policy to 'RemoteSigned'?"
+        'ExecutionPolicyWarning' = "Execution Policy Warning"
+        'PolicyChanged' = "Execution policy changed to 'RemoteSigned'."
+        'PolicyChangedTitle' = "Policy Changed"
+        'PolicyChangeError' = "Failed to change execution policy: {0}"
+        'ErrorTitle' = "Error"
+        'OperationCanceled' = "Operation canceled. Script will exit."
+        'CanceledTitle' = "Canceled"
+        'JsonFiles' = "JSON files (*.json)|*.json|All files (*.*)|*.*"
+        'SelectWingetFile' = "Select Winget Import File"
+        'ConfirmImport' = "This will install all applications listed in the selected file.`n`nDo you want to continue?"
+        'ConfirmImportTitle' = "Confirm Import"
+        'ImportSuccess' = "Applications have been successfully imported from {0}"
+        'SuccessTitle' = "Success"
+        'ImportCanceled' = "Import operation was canceled."
+        'NoFileSelected' = "No file was selected."
+        'ErrorOccurred' = "An error occurred: {0}"
+    }
+    'de-DE' = @{
+        'ExecutionPolicyRestricted' = "Die aktuelle Ausfuehrungsrichtlinie ist auf 'Restricted' festgelegt.`n`nDies verhindert die Ausfuehrung von Skripten. Moechten Sie die Ausfuehrungsrichtlinie auf 'RemoteSigned' aendern?"
+        'ExecutionPolicyWarning' = "Ausfuehrungsrichtlinie Warnung"
+        'PolicyChanged' = "Ausfuehrungsrichtlinie wurde auf 'RemoteSigned' geaendert."
+        'PolicyChangedTitle' = "Richtlinie Geaendert"
+        'PolicyChangeError' = "Fehler beim Aendern der Ausfuehrungsrichtlinie: {0}"
+        'ErrorTitle' = "Fehler"
+        'OperationCanceled' = "Vorgang abgebrochen. Skript wird beendet."
+        'CanceledTitle' = "Abgebrochen"
+        'JsonFiles' = "JSON Dateien (*.json)|*.json|Alle Dateien (*.*)|*.*"
+        'SelectWingetFile' = "Winget Import Datei auswaehlen"
+        'ConfirmImport' = "Dies installiert alle Anwendungen aus der ausgewaehlten Datei.`n`nMoechten Sie fortfahren?"
+        'ConfirmImportTitle' = "Import Bestaetigen"
+        'ImportSuccess' = "Anwendungen wurden erfolgreich von {0} importiert"
+        'SuccessTitle' = "Erfolg"
+        'ImportCanceled' = "Import-Vorgang wurde abgebrochen."
+        'NoFileSelected' = "Keine Datei ausgewaehlt."
+        'ErrorOccurred' = "Ein Fehler ist aufgetreten: {0}"
+    }
+}
+
+# Default to English if system language is not supported
+if (-not $translations.ContainsKey($systemCulture)) {
+    $systemCulture = 'en-US'
+}
+
+# Get translation function
+function Get-Translation {
+    param (
+        [string]$Key,
+        [array]$Parameters = @()
+    )
+    
+    $text = $translations[$systemCulture][$Key]
+    if ($Parameters.Count -gt 0) {
+        $text = [string]::Format($text, $Parameters)
+    }
+    return $text
+}
+
+# Function to check and adjust execution policy
+function Check-ExecutionPolicy {
+    $currentPolicy = Get-ExecutionPolicy
+    if ($currentPolicy -eq 'Restricted') {
+        $result = [System.Windows.Forms.MessageBox]::Show(
+            (Get-Translation 'ExecutionPolicyRestricted'),
+            (Get-Translation 'ExecutionPolicyWarning'),
             [System.Windows.Forms.MessageBoxButtons]::YesNo,
             [System.Windows.Forms.MessageBoxIcon]::Warning
         )
 
-        if ($resultaat -eq [System.Windows.Forms.DialogResult]::Yes) {
+        if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
             try {
                 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-                [System.Windows.Forms.MessageBox]::Show("Uitvoeringsbeleid is gewijzigd naar 'RemoteSigned'.", "Beleid Gewijzigd")
+                [System.Windows.Forms.MessageBox]::Show(
+                    (Get-Translation 'PolicyChanged'),
+                    (Get-Translation 'PolicyChangedTitle')
+                )
             } catch {
-                [System.Windows.Forms.MessageBox]::Show("Kon het uitvoeringsbeleid niet wijzigen: $_", "Fout")
+                [System.Windows.Forms.MessageBox]::Show(
+                    (Get-Translation 'PolicyChangeError' $_),
+                    (Get-Translation 'ErrorTitle')
+                )
                 exit
             }
         } else {
-            [System.Windows.Forms.MessageBox]::Show("Bewerking geannuleerd. Script wordt afgesloten.", "Geannuleerd")
+            [System.Windows.Forms.MessageBox]::Show(
+                (Get-Translation 'OperationCanceled'),
+                (Get-Translation 'CanceledTitle')
+            )
             exit
         }
     }
 }
 
-# Functie om een Bestand Openen dialoog te tonen
-function Toon-BestandKiezer {
-    # Maak een OpenFileDialog object
-    $bestandKiezer = New-Object System.Windows.Forms.OpenFileDialog
+# Function to show an Open File dialog
+function Show-OpenFileDialog {
+    $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+    $openFileDialog.Filter = (Get-Translation 'JsonFiles')
+    $openFileDialog.Title = (Get-Translation 'SelectWingetFile')
+    $openFileDialog.InitialDirectory = [System.Environment]::GetFolderPath('Desktop')
 
-    # Stel eigenschappen in voor de dialoog
-    $bestandKiezer.Filter = "JSON bestanden (*.json)|*.json|Alle bestanden (*.*)|*.*"
-    $bestandKiezer.Title = "Selecteer Winget Import Bestand"
-    $bestandKiezer.InitialDirectory = [System.Environment]::GetFolderPath('Desktop')
-
-    # Toon de dialoog en krijg het resultaat
-    if ($bestandKiezer.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
-        return $bestandKiezer.FileName  # Geef het geselecteerde bestandspad terug
+    if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+        return $openFileDialog.FileName
     } else {
-        return $null  # Als geannuleerd, geef null terug
+        return $null
     }
 }
 
-# Hoofdscript uitvoering
+# Main script execution
 try {
-    # Controleer en pas uitvoeringsbeleid aan indien nodig
-    Controleer-UitvoerBeleid
+    Check-ExecutionPolicy
+    $inputFilePath = Show-OpenFileDialog
 
-    # Roep de functie aan om de bestandkiezer te tonen
-    $invoerBestandPad = Toon-BestandKiezer
-
-    # Controleer of er een bestandspad is geselecteerd
-    if ($null -ne $invoerBestandPad) {
-        # Toon bevestigingsdialoog
-        $resultaat = [System.Windows.Forms.MessageBox]::Show(
-            "Dit zal alle applicaties installeren die in het geselecteerde bestand staan.`n`nWilt u doorgaan?",
-            "Bevestig Import",
+    if ($null -ne $inputFilePath) {
+        $result = [System.Windows.Forms.MessageBox]::Show(
+            (Get-Translation 'ConfirmImport'),
+            (Get-Translation 'ConfirmImportTitle'),
             [System.Windows.Forms.MessageBoxButtons]::YesNo,
             [System.Windows.Forms.MessageBoxIcon]::Question
         )
 
-        if ($resultaat -eq [System.Windows.Forms.DialogResult]::Yes) {
-            # Voer het winget import commando uit
-            $commando = "winget import -i `"$invoerBestandPad`""
-            
-            # Voer het commando uit
-            Invoke-Expression $commando
+        if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
+            $command = "winget import -i `"$inputFilePath`""
+            Invoke-Expression $command
 
-            # Informeer de gebruiker dat de import is voltooid
-            [System.Windows.Forms.MessageBox]::Show("Applicaties zijn succesvol geimporteerd van $invoerBestandPad", "Succes")
+            [System.Windows.Forms.MessageBox]::Show(
+                (Get-Translation 'ImportSuccess' $inputFilePath),
+                (Get-Translation 'SuccessTitle')
+            )
         } else {
-            [System.Windows.Forms.MessageBox]::Show("Import bewerking is geannuleerd.", "Geannuleerd")
+            [System.Windows.Forms.MessageBox]::Show(
+                (Get-Translation 'ImportCanceled'),
+                (Get-Translation 'CanceledTitle')
+            )
         }
     } else {
-        [System.Windows.Forms.MessageBox]::Show("Geen bestand geselecteerd.", "Geannuleerd")
+        [System.Windows.Forms.MessageBox]::Show(
+            (Get-Translation 'NoFileSelected'),
+            (Get-Translation 'CanceledTitle')
+        )
     }
 } catch {
-    [System.Windows.Forms.MessageBox]::Show("Er is een fout opgetreden: $_", "Fout")
+    [System.Windows.Forms.MessageBox]::Show(
+        (Get-Translation 'ErrorOccurred' $_),
+        (Get-Translation 'ErrorTitle')
+    )
 }

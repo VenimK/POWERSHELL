@@ -46,6 +46,60 @@ function Get-FormattedSize {
     return "{0:N2} {1}" -f $Bytes, $sizes[$order]
 }
 
+function Check-BIOSUpdates {
+    param (
+        [string]$Manufacturer,
+        [string]$Model,
+        [string]$CurrentBIOSVersion
+    )
+
+    try {
+        Write-ColoredHeader "BIOS UPDATE CHECK"
+        
+        switch -Wildcard ($Manufacturer.ToLower()) {
+            "*asus*" {
+                $modelFormatted = $Model.Replace(" ", "-")
+                $supportUrl = "https://www.asus.com/supportonly/$modelFormatted/HelpDesk_BIOS/"
+                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                Write-Host "`nGa naar de bovenstaande URL om te controleren op BIOS updates." -ForegroundColor Yellow
+                Write-Host "Let op: Download en installeer BIOS updates alleen van de officiële website." -ForegroundColor Yellow
+            }
+            "*dell*" {
+                $serviceTag = (Get-CimInstance -ClassName Win32_BIOS).SerialNumber
+                $supportUrl = "https://www.dell.com/support/home/product-support/servicetag/$serviceTag/drivers"
+                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                Write-Host "`nGa naar de bovenstaande URL om te controleren op BIOS updates." -ForegroundColor Yellow
+            }
+            "*hp*" {
+                $supportUrl = "https://support.hp.com/drivers"
+                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                Write-Host "`nGa naar de bovenstaande URL en voer uw productmodel ($Model) in." -ForegroundColor Yellow
+            }
+            "*lenovo*" {
+                $supportUrl = "https://pcsupport.lenovo.com/downloads/ds012808"
+                Write-Host "BIOS Support Pagina: $supportUrl" -ForegroundColor Cyan
+                Write-Host "Huidige BIOS Versie: $CurrentBIOSVersion" -ForegroundColor Green
+                Write-Host "`nGa naar de bovenstaande URL en voer uw productmodel ($Model) in." -ForegroundColor Yellow
+            }
+            default {
+                Write-Host "Automatische BIOS update controle niet beschikbaar voor $Manufacturer" -ForegroundColor Yellow
+                Write-Host "Bezoek de website van uw fabrikant voor BIOS updates." -ForegroundColor Yellow
+            }
+        }
+        
+        Write-Host "`nWaarschuwing:" -ForegroundColor Red
+        Write-Host "- Maak altijd een back-up van uw gegevens voor het updaten van de BIOS" -ForegroundColor Red
+        Write-Host "- Zorg voor een stabiele stroomvoorziening tijdens de BIOS update" -ForegroundColor Red
+        Write-Host "- Onderbreek het update proces NOOIT" -ForegroundColor Red
+    }
+    catch {
+        Write-Host "Fout bij het controleren van BIOS updates: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
 # Systeem Informatie
 Write-ColoredHeader "SYSTEEM INFORMATIE"
 $computerSystem = Get-CimInstance -ClassName Win32_ComputerSystem
@@ -111,6 +165,8 @@ Write-Host "BIOS Fabrikant: " -NoNewline; Write-Host $bios.Manufacturer -Foregro
 Write-Host "BIOS Release Datum: " -NoNewline; Write-Host $bios.ReleaseDate.ToString("dd-MM-yyyy") -ForegroundColor Green
 Write-Host "Serienummer: " -NoNewline; Write-Host $bios.SerialNumber -ForegroundColor Green
 Write-Host "SMBIOS Versie: " -NoNewline; Write-Host $bios.SMBIOSBIOSVersion -ForegroundColor Green
+
+Check-BIOSUpdates -Manufacturer $computerSystem.Manufacturer -Model $computerSystem.Model -CurrentBIOSVersion $bios.Version
 
 # Moederbord Informatie
 Write-ColoredHeader "MOEDERBORD INFORMATIE"
@@ -388,6 +444,28 @@ if ($ExportToHTML) {
             <p><span class="label">BIOS Fabrikant:</span> <span class="value">$($bios.Manufacturer)</span></p>
             <p><span class="label">Release Datum:</span> <span class="value">$($bios.ReleaseDate.ToString("dd-MM-yyyy"))</span></p>
             <p><span class="label">SMBIOS Versie:</span> <span class="value">$($bios.SMBIOSBIOSVersion)</span></p>
+        </div>
+
+        <div class="info-group">
+            <h2>BIOS Update Informatie</h2>
+            <p><span class="label">Support Pagina:</span> <span class="value"><a href="$(
+                switch -Wildcard ($computerSystem.Manufacturer.ToLower()) {
+                    "*asus*" { "https://www.asus.com/supportonly/$($computerSystem.Model.Replace(' ', '-'))/HelpDesk_BIOS/" }
+                    "*dell*" { "https://www.dell.com/support/home/product-support/servicetag/$($bios.SerialNumber)/drivers" }
+                    "*hp*" { "https://support.hp.com/drivers" }
+                    "*lenovo*" { "https://pcsupport.lenovo.com/downloads/ds012808" }
+                    default { "#" }
+                }
+            )" target="_blank">BIOS Downloads</a></span></p>
+            <div class="warning" style="margin-top: 15px; padding: 10px; border-left: 4px solid #e74c3c;">
+                <strong>Waarschuwing voor BIOS Updates:</strong>
+                <ul>
+                    <li>Maak altijd een back-up van uw gegevens voor het updaten van de BIOS</li>
+                    <li>Zorg voor een stabiele stroomvoorziening tijdens de BIOS update</li>
+                    <li>Onderbreek het update proces NOOIT</li>
+                    <li>Download BIOS updates alleen van de officiële website van de fabrikant</li>
+                </ul>
+            </div>
         </div>
 
         <div class="info-group">

@@ -13,7 +13,7 @@ Write-Host "QR Code aan het genereren voor WiFi netwerk..."
 $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + [uri]::EscapeDataString($WifiString)
 
 # Download de QR code
-$QRPath = Join-Path $PSScriptRoot "WiFiQRCode.png"
+$QRPath = Join-Path ([Environment]::GetFolderPath('Desktop')) "WiFiQRCode.png"
 $webClient = New-Object System.Net.WebClient
 $webClient.DownloadFile($qrUrl, $QRPath)
 Write-Host "QR Code gegenereerd op locatie: $QRPath"

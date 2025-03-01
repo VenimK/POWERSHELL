@@ -5,10 +5,22 @@
 # van de laatste 60 dagen. Als er geen geschiedenis beschikbaar is,
 # wordt het huidige netwerk gebruikt.
 #
-# Gebruik:
+# Gebruik (kies een van deze methodes):
+#
+# Methode 1 (Tijdelijk bypass):
 # 1. Start PowerShell als Administrator
 # 2. Navigeer naar de map met dit script
-# 3. Voer uit: .\QRMostUsedWifi.ps1
+# 3. Voer uit: powershell -ExecutionPolicy Bypass -File QRMostUsedWifi.ps1
+#
+# Methode 2 (Script ondertekenen):
+# 1. Start PowerShell als Administrator
+# 2. Voer uit: Set-ExecutionPolicy RemoteSigned
+# 3. Navigeer naar de map met dit script
+# 4. Voer uit: .\QRMostUsedWifi.ps1
+#
+# Methode 3 (Voor één keer):
+# 1. Rechtsklik op het script
+# 2. Kies 'Met PowerShell uitvoeren'
 #
 # De QR code wordt opgeslagen op het bureaublad als 'WiFiQRCode.png'
 # Deze QR code kan gescand worden met een telefoon/tablet om

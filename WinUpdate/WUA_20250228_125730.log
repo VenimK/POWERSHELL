@@ -1,0 +1,32 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20250228125730
+Username: LAPTOP-1IRAO6G9\desir
+RunAs User: LAPTOP-1IRAO6G9\desir
+Configuration Name: 
+Machine: LAPTOP-1IRAO6G9 (Microsoft Windows NT 10.0.19045.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File E:\TECHSTICK\POWERSHELL\WUA.ps1
+Process ID: 3328
+PSVersion: 5.1.19041.5486
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.19041.5486
+BuildVersion: 10.0.19041.5486
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is E:\TECHSTICK\POWERSHELL\WinUpdate\WUA_20250228_125730.log
+Start logboek registratie...
+Windows Update Analyse wordt gestart...
+Nieuwe wsusscn2.cab bestand wordt gedownload...
+Nieuwe wsusscn2.cab bestand wordt gedownload...
+PS>TerminatingError(): "The pipeline has been stopped."
+>> TerminatingError(): "The pipeline has been stopped."
+>> TerminatingError(): "The pipeline has been stopped."
+>> $global:?
+>> TerminatingError(): "The pipeline has been stopped."
+**********************
+Windows PowerShell transcript end
+End time: 20250228130311
+**********************

@@ -19,36 +19,35 @@ A collection of useful PowerShell scripts for various system administration, aut
 - **updater.ps1**: System update automation tool
 
 ### WiFi & Network Tools
-- **QRMostUsedWifi.ps1**: Generates QR codes for your most frequently used WiFi networks
+- **QRMostUsedWifi.ps1**: Generates QR codes for your most frequently used WiFi networks, including network name and password
 - **QWIFI.ps1**: Quick WiFi connection utility
-- **WifiHistory.ps1**: Shows WiFi connection history
-- **ExportWLAN.ps1**: Exports WiFi network profiles
-- **ImportWLAN.ps1**: Imports WiFi network profiles
+- **WifiHistory.ps1**: Shows WiFi connection history with connection counts
+- **ExportWLAN.ps1**: Exports WiFi network profiles for backup or transfer
+- **ImportWLAN.ps1**: Imports WiFi network profiles from backup
 
 ### Browser Tools
 - **fetchchrome.ps1**: Chrome browser data extraction utility
-- **fetchchromebookmarks.ps1**: Exports Chrome bookmarks
-- **fetchedge.ps1**: Microsoft Edge data management
+- **fetchchromebookmarks.ps1**: Exports Chrome bookmarks to a file
+- **fetchedge.ps1**: Microsoft Edge data management and backup
 
 ### Software Management
-- **ExportApps.ps1**: Exports list of installed applications
-- **ExportWinget.ps1**: Exports winget package list
-- **ImportWinget.ps1**: Imports and installs winget packages
-- **install-winget.ps1**: Winget package manager installation
-- **installed.ps1**: Shows installed software information
+- **ExportApps.ps1**: Exports list of installed applications to a file
+- **ExportWinget.ps1**: Exports winget package list for backup
+- **ImportWinget.ps1**: Imports and installs winget packages from list
+- **install-winget.ps1**: Automated winget package manager installation
+- **installed.ps1**: Shows detailed installed software information
 
 ### Document Processing
-- **EANGenerator.ps1**: Generates and inserts EAN barcodes into Word documents
+- **EANGenerator.ps1**: Generates and inserts EAN-13 barcodes into Word documents, supporting multiple barcodes per document
 
-### System Tweaks
-- **tweak.ps1**: System optimization tweaks
-- **tweaked.ps1**: Additional system optimizations
-- **tweaked1.ps1**: Extended system tweaks
-- **signwin.ps1**: Windows signing utility
+### System Tweaks & Utilities
+- **tweak.ps1**: System optimization and performance tweaks
+- **signwin.ps1**: Windows signing utility for scripts and executables
+- **list.ps1**: Lists system information and configurations
 
 ### Notifications
 - **noti.ps1**: Custom notification system
-- **notid.ps1**: Notification daemon/service
+- **notid.ps1**: Notification daemon/service for background alerts
 
 ## 🔧 Usage
 

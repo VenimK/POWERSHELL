@@ -88,6 +88,8 @@ try {
     # Generate WiFi QR Code
     $WifiString = "WIFI:T:WPA;S:$selectedNetwork;P:$password;;"
     Write-Host "QR Code aan het genereren voor WiFi netwerk..."
+    Write-Host "Netwerk: $selectedNetwork" -ForegroundColor Green
+    Write-Host "Wachtwoord: $password" -ForegroundColor Green
 
     # Create the QR code URL
     $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + [uri]::EscapeDataString($WifiString)

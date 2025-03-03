@@ -169,7 +169,7 @@ try {
     # Toon resultaten in console
     $Results | Format-Table -AutoSize -Wrap
 
-    Write-Host "`nBookmarks zijn geëxporteerd naar: $ExportFile" -Encoding UTF8
+    Write-Host "`nBookmarks zijn geexporteerd naar: $ExportFile" -Encoding UTF8
     Write-Host "Gebruik parameters voor verschillende export opties:" -Encoding UTF8
     Write-Host " -ExportFormat: 'CSV', 'HTML', of 'JSON'" -Encoding UTF8
     Write-Host " -SortByDate: Sorteer op datum toegevoegd" -Encoding UTF8

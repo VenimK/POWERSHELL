@@ -22,6 +22,8 @@ $translations = @{
         'ImportCanceled' = "Import bewerking is geannuleerd."
         'NoFileSelected' = "Geen bestand geselecteerd."
         'ErrorOccurred' = "Er is een fout opgetreden: {0}"
+        'DutchLanguageNotAvailable' = "Nederlands taalpakket is niet geïnstalleerd in Windows.`n`nWinget zal in het Engels worden weergegeven.`n`nInstalleer het Nederlandse taalpakket via Windows-instellingen > Tijd en taal > Taal om Winget in het Nederlands te gebruiken."
+        'LanguageWarning' = "Taal Waarschuwing"
     }
     'en-US' = @{
         'ExecutionPolicyRestricted' = "The current execution policy is set to 'Restricted'.`n`nThis prevents scripts from running. Would you like to change the execution policy to 'RemoteSigned'?"
@@ -63,9 +65,9 @@ $translations = @{
     }
 }
 
-# Default to English if system language is not supported
+# Default to Dutch if system language is not supported
 if (-not $translations.ContainsKey($systemCulture)) {
-    $systemCulture = 'en-US'
+    $systemCulture = 'nl-NL'
 }
 
 # Get translation function
@@ -117,6 +119,21 @@ function Check-ExecutionPolicy {
     }
 }
 
+# Function to check if Dutch language is available
+function Test-DutchLanguage {
+    $dutchLanguage = Get-WinSystemLocale | Where-Object { $_.Name -eq 'nl-NL' }
+    if (-not $dutchLanguage) {
+        [System.Windows.Forms.MessageBox]::Show(
+            (Get-Translation 'DutchLanguageNotAvailable'),
+            (Get-Translation 'LanguageWarning'),
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        )
+        return $false
+    }
+    return $true
+}
+
 # Function to show an Open File dialog
 function Show-OpenFileDialog {
     $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
@@ -134,6 +151,7 @@ function Show-OpenFileDialog {
 # Main script execution
 try {
     Check-ExecutionPolicy
+    Test-DutchLanguage
     $inputFilePath = Show-OpenFileDialog
 
     if ($null -ne $inputFilePath) {
@@ -145,6 +163,11 @@ try {
         )
 
         if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
+            # Set Windows language preference to Dutch before running winget
+            $env:LANG = "nl-NL"
+            [System.Threading.Thread]::CurrentThread.CurrentUICulture = 'nl-NL'
+            [System.Threading.Thread]::CurrentThread.CurrentCulture = 'nl-NL'
+            
             $command = "winget import -i `"$inputFilePath`""
             Invoke-Expression $command
 
